@@ -16,7 +16,7 @@ async function chargerEtAfficherMenu() {
     try {
         // lien api
         const reponse = await fetch(
-            "http://localhost/eatsmart-pierre/articles",
+            "http://localhost/pierreburnier/pierre-api-eatsmart/articles",
         );
 
         if (!reponse.ok) {
