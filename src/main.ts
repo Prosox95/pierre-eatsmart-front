@@ -1,4 +1,3 @@
-// Fichier d'importation
 import "./style.css";
 
 type Pizza = {
@@ -32,16 +31,17 @@ const menu: Pizza[] = [
     },
 ];
 
-// affichage console
-console.log(menu);
-
-// div principale de notre page HTML
 const appDiv = document.querySelector<HTMLDivElement>("#app")!;
 
-// contenaire html qui va accueillir les cartes des pizzas
-let htmlAInjecter = '<div class="menu-container">';
+// crée une variable pour stocker le HTML à injecter dans la page
+let htmlAInjecter = `
+  <header>
+    <h1>EatSmart - Carte du Restaurant</h1>
+  </header>
+  <main class="menu-container">
+`;
 
-// boucle sur chaque pizza pour créer sa "carte" HTML
+// boucle sur les pizzas du menu pour créer une carte pour chacune d'entre elles
 menu.forEach((pizza) => {
     htmlAInjecter += `
     <div class="card">
@@ -52,7 +52,10 @@ menu.forEach((pizza) => {
   `;
 });
 
-htmlAInjecter += "</div>";
+// ferme balise main
+htmlAInjecter += `
+  </main>
+`;
 
-// injecte le HTML généré dans la div principale
+// injecte le HTML
 appDiv.innerHTML = htmlAInjecter;
