@@ -1,4 +1,6 @@
-// Définition du type Pizza
+// Fichier d'importation
+import "./style.css";
+
 type Pizza = {
     description: string;
     id: number;
@@ -6,7 +8,6 @@ type Pizza = {
     prix: number;
 };
 
-// Création d'un tableau de pizzas avec des données codé en dur
 const menu: Pizza[] = [
     {
         description:
@@ -31,5 +32,27 @@ const menu: Pizza[] = [
     },
 ];
 
-// Affichage du menu dans la console
+// affichage console
 console.log(menu);
+
+// div principale de notre page HTML
+const appDiv = document.querySelector<HTMLDivElement>("#app")!;
+
+// contenaire html qui va accueillir les cartes des pizzas
+let htmlAInjecter = '<div class="menu-container">';
+
+// boucle sur chaque pizza pour créer sa "carte" HTML
+menu.forEach((pizza) => {
+    htmlAInjecter += `
+    <div class="card">
+      <h3>${pizza.nom}</h3>
+      <p>${pizza.description}</p>
+      <p><strong>Prix : ${pizza.prix}€</strong></p>
+    </div>
+  `;
+});
+
+htmlAInjecter += "</div>";
+
+// injecte le HTML généré dans la div principale
+appDiv.innerHTML = htmlAInjecter;
