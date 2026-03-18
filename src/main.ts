@@ -13,6 +13,40 @@ const appDiv = document.querySelector<HTMLDivElement>("#app")!;
 
 const panier: Plats[] = []; // tableau pour stocker les plats ajoutés au panier
 
+// Fonction dédiée à la mise à jour visuelle du panier
+function mettreAJourPanier() {
+  const cartItemsDiv = document.querySelector<HTMLDivElement>("#cart-items");
+  // 1. On cible la balise <span> qui contient le prix total
+  const totalPrixSpan = document.querySelector<HTMLSpanElement>("#total-prix");
+
+  if (!cartItemsDiv || !totalPrixSpan) return;
+
+  if (panier.length === 0) {
+    cartItemsDiv.innerHTML = "<p>Votre panier est vide</p>";
+    totalPrixSpan.textContent = "0.00"; // On remet le total à zéro si le panier est vide
+    return;
+  }
+
+  let htmlPanier = "";
+  // 2. On crée une variable pour stocker la somme
+  let total = 0;
+
+  panier.forEach((plat) => {
+    htmlPanier += `
+      <div class="cart-item">
+        <span>${plat.nom}</span>
+        <span>${plat.prix}€</span>
+      </div>
+    `;
+    // 3. À chaque tour de boucle, on ajoute le prix du plat au total
+    total += Number(plat.prix);
+  });
+
+  cartItemsDiv.innerHTML = htmlPanier;
+
+  // 4. On affiche le total dans le HTML en forçant 2 chiffres après la virgule
+  totalPrixSpan.textContent = total.toFixed(2);
+}
 // Cette fonction va se charger de récupérer les données depuis le serveur et de les afficher à l'écran
 async function chargerEtAfficherMenu() {
   let platsRecus: Plats[] = [];
@@ -30,39 +64,32 @@ async function chargerEtAfficherMenu() {
     // On stocke les données reçues dans une variable de type Plats[]
     platsRecus = await reponse.json();
 
-    // besoin 3 de l'éval : api externe pour récupérer un message du jour à afficher dans le header
-    const reponseMessage = await fetch(
-      "https://jsonplaceholder.typicode.com/todos/1"
-    );
-
-    const messageData = await reponseMessage.json();
-    const messageDuJour = messageData.title;
-
     // header avec : titre, message du jour (besoin 3) et nombre de plats reçus du serveur (besoin 1), puis ouverture du conteneur principal
     let htmlAInjecter = `
       <header>
         <h1>EatSmart - Carte du Restaurant</h1>
         <h3> Nombre de plats sur la carte : ${platsRecus.length} </h3>
-        <p class="message-du-jour">Message du jour : ${messageDuJour}</p>
       </header>
-      <main class="menu-container">
+      <main class="content-wrapper">
+        <div class="menu-container">
     `;
 
     // boucle pour créer une carte pour chaque plats reçue du serveur, si le prix est inférieur à 10€ on affiche "Bon plan !" (besoin 2)
     platsRecus.forEach((plat) => {
       htmlAInjecter += `
-        <div class="card">
-          <h2>${plat.nom}</h2>
-          <p>${plat.description}</p>
-          <p>Prix : ${plat.prix}€ ${
+          <div class="card">
+            <h2>${plat.nom}</h2>
+            <p>${plat.description}</p>
+            <p>Prix : ${plat.prix}€ ${
         plat.prix <= 10 ? "<p class='bon-plan'>Bon plan !</p>" : ""
       }</p>
-          <button class="btn-order">Ajouter au panier</button>
-        </div>
-      `;
+            <button class="btn-order">Ajouter au panier</button>
+          </div>
+          `;
     });
 
     htmlAInjecter += `
+        </div>
         <aside class="cart-container">
         <h2>Votre Panier</h2>
         <div id="cart-items">
@@ -72,9 +99,8 @@ async function chargerEtAfficherMenu() {
         <div class="cart-total">
           <strong>Total : <span id="total-prix">0.00</span>€</strong>
         </div>
-    </aside>
-    </div>
-      `;
+        </aside>
+        `;
 
     // ferme le conteneur principal
     htmlAInjecter += `
@@ -99,9 +125,10 @@ async function chargerEtAfficherMenu() {
       console.log(
         `Bouton n°${index} cliqué ! Vous avez ajouté : ${platClique.nom} à votre panier.`
       );
-      // Ajoute le plat correspondant au panier
+      // ajouter le plat au panier
       panier.push(platClique);
-      console.log("Contenu actuel du panier :", panier);
+      console.log("Panier actuel :", panier);
+      mettreAJourPanier();
     });
   });
 }
