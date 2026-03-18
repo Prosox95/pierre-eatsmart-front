@@ -30,22 +30,34 @@ async function chargerEtAfficherMenu() {
     // On stocke les données reçues dans une variable de type Plats[]
     platsRecus = await reponse.json();
 
-    // injection du HTML de base (header + conteneur principal) dans lequel on va ensuite injecter les cartes de plats
+    // besoin 3 de l'éval : api externe pour récupérer un message du jour à afficher dans le header
+    const reponseMessage = await fetch(
+      "https://jsonplaceholder.typicode.com/todos/1"
+    );
+
+    const messageData = await reponseMessage.json();
+    const messageDuJour = messageData.title;
+
+    // header avec : titre, message du jour (besoin 3) et nombre de plats reçus du serveur (besoin 1), puis ouverture du conteneur principal
     let htmlAInjecter = `
       <header>
         <h1>EatSmart - Carte du Restaurant</h1>
+        <h3> Nombre de plats sur la carte : ${platsRecus.length} </h3>
+        <p class="message-du-jour">Message du jour : ${messageDuJour}</p>
       </header>
       <main class="menu-container">
     `;
 
-    // boucle pour créer une carte pour chaque plats reçue du serveur
-    platsRecus.forEach((plats) => {
+    // boucle pour créer une carte pour chaque plats reçue du serveur, si le prix est inférieur à 10€ on affiche "Bon plan !" (besoin 2)
+    platsRecus.forEach((plat) => {
       htmlAInjecter += `
         <div class="card">
-          <h3>${plats.nom}</h3>
-          <p>${plats.description}</p>
-          <p><strong>Prix : ${plats.prix}€</strong></p>
-          <button class="btn-order">Ajouter</button>
+          <h2>${plat.nom}</h2>
+          <p>${plat.description}</p>
+          <p>Prix : ${plat.prix}€ ${
+        plat.prix <= 10 ? "<p class='bon-plan'>Bon plan !</p>" : ""
+      }</p>
+          <button class="btn-order">Ajouter au panier</button>
         </div>
       `;
     });
