@@ -1,5 +1,6 @@
 import "./style.css";
 
+// On garde notre type bien au chaud pour plus tard
 type Pizza = {
     description: string;
     id: number;
@@ -7,55 +8,29 @@ type Pizza = {
     prix: number;
 };
 
-const menu: Pizza[] = [
-    {
-        description:
-            "sauce tomate premium, origan, huile d'olive extra vierge, anchois, olive",
-        id: 1,
-        nom: "Anchois 23cm",
-        prix: 7.9,
-    },
-    {
-        description:
-            "sauce tomate premium, origan, huile d'olive extra vierge, emmental, basilic, olive",
-        id: 2,
-        nom: "Emmental 23cm",
-        prix: 7.9,
-    },
-    {
-        description:
-            "sauce tomate premium, origan, huile d'olive extra vierge, mozzarella",
-        id: 3,
-        nom: "Margherita 23cm",
-        prix: 7.9,
-    },
-];
+// Nouvelle fonction asynchrone pour aller chercher les plats sur le serveur
+async function testerLiaisonAPI() {
+    try {
+        // lien api
+        const reponse = await fetch("TON_URL_API_ICI");
 
-const appDiv = document.querySelector<HTMLDivElement>("#app")!;
+        // vérifie si le serveur a bien répondu (statut 200)
+        if (!reponse.ok) {
+            throw new Error(`Erreur HTTP : ${reponse.status}`);
+        }
 
-// crée une variable pour stocker le HTML à injecter dans la page
-let htmlAInjecter = `
-  <header>
-    <h1>EatSmart - Carte du Restaurant</h1>
-  </header>
-  <main class="menu-container">
-`;
+        // transforme la réponse du serveur en données utilisables (JSON)
+        const platsReçus = await reponse.json();
 
-// boucle sur les pizzas du menu pour créer une carte pour chacune d'entre elles
-menu.forEach((pizza) => {
-    htmlAInjecter += `
-    <div class="card">
-      <h3>${pizza.nom}</h3>
-      <p>${pizza.description}</p>
-      <p><strong>Prix : ${pizza.prix}€</strong></p>
-    </div>
-  `;
-});
+        // affichage console pour vérifier que tout est en ordre
+        console.log(
+            "Connexion établie ! Voici les données du serveur :",
+            platsReçus,
+        );
+    } catch (erreur) {
+        console.error("Impossible de joindre le serveur :", erreur);
+    }
+}
 
-// ferme balise main
-htmlAInjecter += `
-  </main>
-`;
-
-// injecte le HTML
-appDiv.innerHTML = htmlAInjecter;
+// lance la fonction au chargement de la page
+testerLiaisonAPI();
