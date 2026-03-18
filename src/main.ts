@@ -1,6 +1,6 @@
 import "./style.css";
 
-// On garde notre type bien au chaud pour plus tard
+// Définition du type pour les pizzas
 type Pizza = {
     description: string;
     id: number;
@@ -8,29 +8,56 @@ type Pizza = {
     prix: number;
 };
 
-// Nouvelle fonction asynchrone pour aller chercher les plats sur le serveur
-async function testerLiaisonAPI() {
+// cible la div principale
+const appDiv = document.querySelector<HTMLDivElement>("#app")!;
+
+// Cette fonction va se charger de récupérer les données depuis le serveur et de les afficher à l'écran
+async function chargerEtAfficherMenu() {
     try {
         // lien api
-        const reponse = await fetch("TON_URL_API_ICI");
+        const reponse = await fetch(
+            "http://localhost/eatsmart-pierre/articles",
+        );
 
-        // vérifie si le serveur a bien répondu (statut 200)
         if (!reponse.ok) {
-            throw new Error(`Erreur HTTP : ${reponse.status}`);
+            throw new Error(`Erreur de communication : ${reponse.status}`);
         }
 
-        // transforme la réponse du serveur en données utilisables (JSON)
-        const platsReçus = await reponse.json();
+        // On stocke les données reçues dans une variable de type Pizza[]
+        const platsRecus: Pizza[] = await reponse.json();
 
-        // affichage console pour vérifier que tout est en ordre
-        console.log(
-            "Connexion établie ! Voici les données du serveur :",
-            platsReçus,
-        );
+        // injection du HTML de base (header + conteneur principal) dans lequel on va ensuite injecter les cartes de pizzas
+        let htmlAInjecter = `
+      <header>
+        <h1>EatSmart - Carte du Restaurant</h1>
+      </header>
+      <main class="menu-container">
+    `;
+
+        // boucle pour créer une carte pour chaque pizza reçue du serveur
+        platsRecus.forEach((pizza) => {
+            htmlAInjecter += `
+        <div class="card">
+          <h3>${pizza.nom}</h3>
+          <p>${pizza.description}</p>
+          <p><strong>Prix : ${pizza.prix}€</strong></p>
+        </div>
+      `;
+        });
+
+        // ferme le conteneur principal
+        htmlAInjecter += `
+      </main>
+    `;
+
+        // affiche le résultat final à l'écran
+        appDiv.innerHTML = htmlAInjecter;
     } catch (erreur) {
-        console.error("Impossible de joindre le serveur :", erreur);
+        console.error("Problème lors du chargement des plats :", erreur);
+        // si le serveur plante, on affiche un message à l'utilisateur au lieu d'une page blanche
+        appDiv.innerHTML = `<h2>Oups, impossible de charger le menu pour le moment...</h2>`;
     }
 }
 
-// lance la fonction au chargement de la page
-testerLiaisonAPI();
+// lance le processus dès que la page s'ouvre !
+chargerEtAfficherMenu();
