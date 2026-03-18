@@ -41,6 +41,7 @@ async function chargerEtAfficherMenu() {
           <h3>${pizza.nom}</h3>
           <p>${pizza.description}</p>
           <p><strong>Prix : ${pizza.prix}€</strong></p>
+          <button class="btn-order">Ajouter</button>
         </div>
       `;
         });
